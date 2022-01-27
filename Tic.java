@@ -1,102 +1,106 @@
-import java.util.*;
-import java.lang.*;
+import java.util.Scanner;
 
-public class Tic {
-    public static String won(String[][] XO) {
-        // checking whether x or o have won
+public class Main {
+    public static void main(String[] args) {
+        // write your code here
+        // function 01
+        Scanner scanner = new Scanner(System.in);
+        char[][] matrix = new char[3][3];
         for (int i = 0; i < 3; i++) {
-            if ((XO[i][1].equals(XO[i][2]) && XO[i][1].equals(XO[i][0])) ||
-                    (XO[1][i].equals(XO[2][i]) && XO[1][i].equals(XO[0][i]))) {
-                if ("X".equals(XO[i][i])) {
-                    return "X";
-                } else if ("O".equals(XO[i][i])) {
-                    return "O";
+            for (int j = 0; j < 3; j++) {
+                matrix[i][j] = ' ';
+            }
+        }
+        printMatrix(matrix);
+        int situation = 0;
+        int turns = 0;
+        while (situation == 0 && turns < 9) {
+            enter(turns, matrix, scanner);
+            printMatrix(matrix);
+            situation = check(matrix);
+            turns++;
+        }
+        switch (situation) {
+            case 1:
+                System.out.println("X wins");
+                break;
+            case 0:
+                System.out.println("Draw");
+                break;
+            case -1:
+                System.out.println("O wins");
+                break;
+            default:
+                break;
+        }
+    }
+    
+    public static void printMatrix(char[][] matrix) {
+        System.out.println("---------");
+        for (int i = 0; i < 3; i++) {
+            System.out.print("| ");
+            for (int j = 0; j < 3; j++) {
+                System.out.print(matrix[i][j] + " ");
+            }
+            System.out.println("|");
+        }
+        System.out.println("---------");
+    }
+    
+    public static int check(char[][] matrix) {
+        int check = 0;
+        boolean diag = (matrix[0][0] == matrix[1][1] && matrix[1][1] == matrix[2][2]) || (matrix[2][0] == matrix[1][1] && matrix[1][1] == matrix[0][2]);
+        if (matrix[1][1] == 'X' && diag) {
+            check = 1;
+        } else if (matrix[1][1] == 'O' && diag) {
+            check = -1;
+        }
+        for (int i = 0; i < 3; i++) {
+            if(matrix[i][0] == matrix[i][1] && matrix[i][1] == matrix[i][2]) {
+                if (matrix[i][0] == 'X') {
+                    check = 1;
+                } else if (matrix[i][0] == 'O') {
+                    check = -1;
+                }
+            } else if (matrix[0][i] == matrix[1][i] && matrix[1][i] == matrix[2][i]) {
+                if (matrix[0][i] == 'X') {
+                    check = 1;
+                } else if (matrix[0][i] == 'O') {
+                    check = -1;
                 }
             }
         }
-        if ((XO[0][0].equals(XO[1][1]) && XO[1][1].equals(XO[2][2])) ||
-                (XO[0][2].equals(XO[1][1]) && XO[1][1].equals(XO[2][0]))) {
-            if ("X".equals(XO[1][1])) {
-                return "X";
-            } else if ("O".equals(XO[1][1])) {
-                return "O";
-            }
-        }
-        return " ";
+        
+        return check;
     }
-    public static void enter(String turn, String[][] XO) {
-        Scanner scan = new Scanner(System.in);
-        String inp1;
-        String inp2;
-        int pos1 = -1;
-        int pos2 = -1;
-        boolean entered = false;
-        while(!entered) {
-            System.out.println("Enter the co-ordinates: ");
+    
+    public static void enter(int turn, char[][] matrix, Scanner scanner) {
+        boolean within = false;
+        String x = "";
+        String y = "";
+        int xPos = 0;
+        int yPos = 0;
+        while (!within) {
+            System.out.println("Enter the coordinates:");
             try {
-                inp1 = scan.next();
-                inp2 = scan.next();
-                pos1 = Integer.parseInt(inp1);
-                pos2 = Integer.parseInt(inp2);
-                if (!((pos1 > 0 && pos1 < 4) || (pos2 > 0 && pos2 < 4) )) {
+                x = scanner.next();
+                y = scanner.next();
+                xPos = Integer.parseInt(x);
+                yPos = Integer.parseInt(y);
+                if (xPos < 1 || xPos > 3 || yPos < 1 || yPos > 3) {
                     System.out.println("Coordinates should be from 1 to 3!");
-                } else if (" ".equals(XO[3 - pos2][pos1 - 1])){
-                    XO[3 - pos2][pos1 - 1] = turn;
-                    entered = true;
-                } else {
+                } else if (matrix[xPos - 1][yPos - 1] != ' ') {
                     System.out.println("This cell is occupied! Choose another one!");
+                } else {
+                    if (turn % 2 == 0) {
+                        matrix[xPos - 1][yPos - 1] = 'X';
+                    } else {
+                        matrix[xPos - 1][yPos - 1] = 'O';
+                    }
+                    within = true;
                 }
             } catch (Exception e) {
                 System.out.println("You should enter numbers!");
-            }
-        }
-        return;
-    }
-    public static void xo(String[][] XO) {
-        System.out.println("---------");
-        for (int i = 0; i <= 2; i++) {
-            System.out.println("| " + XO[i][0] + " " + XO[i][1] + " " + XO[i][2] + " |");
-        }
-        System.out.println("---------");
-    }
-    public static void main(String[] args) {
-        // write your code here
-        Scanner scan = new Scanner(System.in);
-        String[][] XO = new String[3][3];
-        String turn = "X";
-        int x = 0;
-        int o = 0;
-        String winner = " ";
-        boolean notOver = true;
-        // breaking down string to matrix, and counting number of x, number of o's
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                XO[i][j] = " ";
-            }
-        }
-        // printing matrix
-        xo(XO);
-        // input from user
-        while (notOver) {
-            enter(turn, XO);
-            xo(XO);
-            if ("X".equals(turn)) {
-                turn = "O";
-                x++;
-            } else {
-                turn = "X";
-                o++;
-            }
-            winner = won(XO);
-            if ("X".equals(winner)) {
-                System.out.println("X wins");
-                notOver = false;
-            } else if ("O".equals(winner)) {
-                System.out.println("O wins");
-                notOver = false;
-            } else if (x + o == 9) {
-                System.out.println("Draw");
-                notOver = false;
             }
         }
     }
